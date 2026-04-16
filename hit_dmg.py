@@ -1,9 +1,10 @@
 from random import random
 
 class HitEvent:
-    def __init__(self, attacker:'Character', target:'Character', multiplier: float = 1.0, skill_dmg: float = 0.0, true_dmg: float = 0.0, ign_armor: bool = False, can_crit: bool = True, hit_type: str = "normal", duration: int = 1):
+    def __init__(self, attacker:'Character', target:'Character', atk: int, multiplier: float = 1.0, skill_dmg: float = 0.0, true_dmg: float = 0.0, ign_armor: bool = False, can_crit: bool = True, hit_type: str = "normal", duration: int = 1):
         self.attacker = attacker
         self.target = target
+        self.atk = atk
         self.multiplier = multiplier
         self.skill_dmg = skill_dmg
         self.true_dmg = true_dmg
@@ -30,7 +31,7 @@ def resolve_hit(event: HitEvent, team1: list, team2: list) -> float:
     allies = team1 if attacker in team1 else team2
     enemies = team2 if attacker in team1 else team1
 
-    dmg = event.base_dmg * event.multiplier
+    dmg = event.atk * event.multiplier
     dmg *= (1 + event.skill_dmg)
 
     # Modification des dégâts par les armes
@@ -42,7 +43,7 @@ def resolve_hit(event: HitEvent, team1: list, team2: list) -> float:
 
     # Calcul du crit
     if event.can_crit and random() < attacker.crit_rate:
-        dmg *= attacker.crit_dmg
+        dmg *= (1 +attacker.crit_dmg)
 
     # True damage
     true_part = min(event.true_dmg, dmg) 
@@ -50,18 +51,18 @@ def resolve_hit(event: HitEvent, team1: list, team2: list) -> float:
 
 
     # Armure
-    armor = 0 if event.ignores_armor else target.armor
+    armor = 0 if event.ignore_armor else target.armor
     armor_factor = 1 - armor_reduction(armor)
     physical_part *= armor_factor
 
 
     # Parade
-    if random() < (target.parry_chance - attacker.hit_chance):
-        physical *= 0.5
+    if random() < (target.block_chance - attacker.hit_chance):
+        physical_part *= 0.5
         true_part *= 0.5
 
     # Total
-    total = physical + true_part
+    total = physical_part + true_part
 
     # Réduction de dégâts
     final = max(0, total * (1-target.dmg_reduction))
@@ -69,28 +70,28 @@ def resolve_hit(event: HitEvent, team1: list, team2: list) -> float:
     # Inflige les dégâts et hooks
     target.hp -= final
     attacker.on_hit(event, final, team1, team2)
-    target.on_receive_hit(event, final, team1, team2)
+    target.on_dmg_taken(event, final, team1, team2)
 
     if target.hp <= 0:
         target.is_alive = False
-        attacker.on_killing_blow()
+        attacker.on_killing_blow(team1, team2)
         for weapon in attacker.weapons:
-            weapon.on_killing_blow()
+            weapon.on_killing_blow(attacker, team1, team2)
         for dragon in attacker.dragons:
-            dragon.on_killing_blow()
+            dragon.on_killing_blow(attacker, team1, team2)
         
         for a in allies:
-            a.on_ennemi_die()
+            a.on_ennemi_die(team1, team2)
             for weapon in a.weapons:
-                weapon.on_ennemi_die()
+                weapon.on_ennemi_die(a, team1, team2)
             for dragon in a.dragons:
-                dragon.on_ennemi_die()
+                dragon.on_ennemi_die(a, team1, team2)
 
         for e in enemies:
-            e.on_ennemi_die()
+            e.on_allie_die(team1, team2)
             for weapon in e.weapons:
-                weapon.on_ennemi_die()
+                weapon.on_allie_die(e, team1, team2)
             for dragon in e.dragons:
-                dragon.on_ennemi_die()
+                dragon.on_allie_die(e, team1, team2)
 
     return final

@@ -26,7 +26,7 @@ def fight(team1:list, team2:list, nb_rounds:int) -> None:
 
         # Boucle pour appliquer les effets de début de round
         for char in all_characters:
-            if char.is_alive():
+            if char.is_alive:
                 char.on_round_start(team1, team2)
                 for weapon in char.weapons:
                     weapon.on_round_start(team1, team2)
@@ -35,13 +35,12 @@ def fight(team1:list, team2:list, nb_rounds:int) -> None:
 
         # Boucle pour que chaque personnage attaque
         for char in all_characters:
-            if char.is_alive() and char.can_play:
+            if char.is_alive and char.can_play:
                 if char.energy >= 100 and not char.is_silenced:
                     hits = char.skill(team1, team2)
                     for hit in hits:
-                        resolve_hit(hit)
+                        resolve_hit(hit, team1, team2)
                     char.energy = 0
-                    char.on_skill()
                     for weapon in char.weapons:
                         weapon.on_skill()
                     for dragon in char.dragons:
@@ -49,9 +48,8 @@ def fight(team1:list, team2:list, nb_rounds:int) -> None:
                 else:
                     hits = char.normal_atk(team1, team2)
                     for hit in hits:
-                        resolve_hit(hit)
+                        resolve_hit(hit, team1, team2)
                     char.energy += 50
-                    char.on_normal_atk()
                     for weapon in char.weapons:
                         weapon.on_normal_atk()
                     for dragon in char.dragons:
@@ -59,9 +57,9 @@ def fight(team1:list, team2:list, nb_rounds:int) -> None:
 
         # Boucle pour appliquer les effets de fin de round
         for char in all_characters:
-            if char.is_alive():
+            if char.is_alive:
                 for dot in char.dots:
-                    resolve_hit(dot)
+                    resolve_hit(dot, team1, team2)
                 char.on_round_end(team1, team2)
                 for weapon in char.weapons:
                     weapon.on_round_end(team1, team2)
@@ -70,10 +68,10 @@ def fight(team1:list, team2:list, nb_rounds:int) -> None:
 
 
         #  Vérification de la fin du combat
-        if all(not char.is_alive() for char in team1):
+        if all(not char.is_alive for char in team1):
             print("Team 2 wins!")
             return
-        elif all(not char.is_alive() for char in team2):
+        elif all(not char.is_alive for char in team2):
             print("Team 1 wins!")
             return
 

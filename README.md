@@ -1,4 +1,4 @@
-# ⚔️ Simulateur_TapTap
+# Simulateur_TapTap
 
 **Simulateur_TapTap** est un moteur de simulation de combat conçu spécifiquement pour le jeu mobile **Tap Force**. 
 
@@ -6,7 +6,7 @@ L'objectif de ce projet est de fournir un environnement de test précis pour rep
 
 ---
 
-## 🚀 Objectifs du Projet
+## Objectifs
 
 - **Précision :** Reproduire fidèlement le système de combat (dégâts, vitesse, coups critiques, parades).
 - **Performance :** Capacité à simuler des milliers de combats en quelques secondes pour obtenir des statistiques fiables (Winrate, DPS moyen, survie).
@@ -14,20 +14,20 @@ L'objectif de ce projet est de fournir un environnement de test précis pour rep
 
 ---
 
-## ✨ Fonctionnalités
+## Fonctionnalités
 
-### 🗡️ Moteur de Combat
+### Moteur de Combat
 - Gestion du tour par tour basée sur la vitesse des personnages.
 - Calcul des dégâts incluant les buffs, débuffs et synergies de faction.
 - Prise en compte des compétences actives et passives.
 
-### 📊 Statistiques & Logs
+### Statistiques & Logs
 - Logs détaillés de chaque action pour le débogage.
 - Résumé statistique après une série de simulations.
 
 ---
 
-## 🛠️ Installation
+## Installation
 
 ### Prérequis
 - Python 3.14

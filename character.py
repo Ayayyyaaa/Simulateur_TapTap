@@ -1,3 +1,6 @@
+from hit_dmg import HitEvent
+import types
+
 class Character:
     def __init__(self, name: str, faction: str, role: str, base_hp: int,
                  base_atk: int, atk: int, base_armor: int, speed: int, skill_dmg: float, 
@@ -114,20 +117,33 @@ class Character:
         self.dots = []
 
         # Compétences et hooks
-        self._normal_atk = normal_atk if normal_atk else self.normal_atk
-        self._skill = skill if skill else self.skill
-        self._on_battle_start = on_battle_start if on_battle_start else self.on_battle_start
-        self._on_round_start = on_round_start if on_round_start else self.on_round_start
-        self._on_round_end = on_round_end if on_round_end else self.on_round_end
-        self._on_ally_die = on_ally_die if on_ally_die else self.on_ally_die
-        self._on_ennemi_die = on_ennemi_die if on_ennemi_die else self.on_ennemi_die
-        self._on_dmg_taken = on_dmg_taken if on_dmg_taken else self.on_dmg_taken
-        self._on_hit = on_hit if on_hit else self.on_hit
-        self._on_killing_blow = on_killing_blow if on_killing_blow else self.on_killing_blow
+        if normal_atk:
+            self.normal_atk = types.MethodType(normal_atk, self)
+        if skill:
+            self.skill = types.MethodType(skill, self)
+        if on_battle_start:
+            self.on_battle_start = types.MethodType(on_battle_start, self)
+        if on_round_start:
+            self.on_round_start = types.MethodType(on_round_start, self)
+        if on_round_end:
+            self.on_round_end = types.MethodType(on_round_end, self)
+        if on_ally_die:
+            self.on_ally_die = types.MethodType(on_ally_die, self)
+        if on_ennemi_die:
+            self.on_ennemi_die = types.MethodType(on_ennemi_die, self)
+        if on_dmg_taken:
+            self.on_dmg_taken = types.MethodType(on_dmg_taken, self)
+        if on_hit:
+            self.on_hit = types.MethodType(on_hit, self)
+        if on_killing_blow:
+            self.on_ennemi_die = types.MethodType(on_killing_blow, self)
 
 
     def normal_atk(self, team1: list, team2: list) -> list:
-        return []
+        ennemies = team1 if self in team2 else team2
+        target = ennemies[0]
+        hits = HitEvent(self, target, self.atk, 1, 0, 0, False, True, "normal", 1)
+        return [hits]
  
     def skill(self, team1: list, team2: list) -> list:
         return []
@@ -153,6 +169,6 @@ class Character:
     def on_hit(self, event, dmg: float, team1: list, team2: list):
         pass
  
-    def on_killing_blow(self):
+    def on_killing_blow(self, team1: list, team2: list):
         pass
  

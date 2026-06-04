@@ -1,0 +1,10 @@
+Maki :
+    - 100%, 80 atk -> 72 dgts = 10% réduction
+
+Fenrus : 
+    - 100%, 168 atk -> 151 dgts = 10% réduction
+
+Lilith :
+    - 100%, 109 atk -> 98 dgts = 10% réduction
+    - 100%, 198 atk -> 178 dgts = 10% réduction
+    - 517 dgts

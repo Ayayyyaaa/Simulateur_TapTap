@@ -1,5 +1,7 @@
 from random import random
 
+BASE_CRIT_DMG = 0.30
+
 class HitEvent:
     def __init__(self, attacker:'Character', target:'Character', atk: int, multiplier: float = 1.0, skill_dmg: float = 0.0, true_dmg: float = 0.0, ign_armor: bool = False, can_crit: bool = True, hit_type: str = "normal", duration: int = 1):
         self.attacker = attacker
@@ -17,13 +19,13 @@ class HitEvent:
         return self.hit_type
 
 def armor_reduction(armor: float, attacker_armor_pen: float = 750) -> float:
-    effective_armor = max(0, armor - attacker_armor_pen)
-    return effective_armor / (effective_armor + 3450)
+    #effective_armor = max(0, armor - attacker_armor_pen)
+    #return effective_armor / (effective_armor + 3450)
+    return 0.9
 
 def resolve_hit(event: HitEvent, team1: list, team2: list) -> float:
     """
-    Couche défensive : armure, réduction, parade, crit, etc.
-    Renvoie les dégâts réellement subis.
+    Permet de calculer les dégâts réels d'un attaque, avec l'application des multis et debuffs d'armure, etc
     """
     target = event.target
     attacker = event.attacker
@@ -43,10 +45,10 @@ def resolve_hit(event: HitEvent, team1: list, team2: list) -> float:
 
     # Calcul du crit
     if event.can_crit and random() < attacker.crit_rate:
-        dmg *= (1 +attacker.crit_dmg)
-
+        dmg *= (1 + BASE_CRIT_DMG + attacker.crit_dmg)
+        
     # True damage
-    true_part = min(event.true_dmg, dmg) 
+    true_part = min(event.true_dmg * dmg, dmg) 
     physical_part = dmg - true_part
 
 
@@ -88,10 +90,10 @@ def resolve_hit(event: HitEvent, team1: list, team2: list) -> float:
                 dragon.on_ennemi_die(a, team1, team2)
 
         for e in enemies:
-            e.on_allie_die(team1, team2)
+            e.on_ally_die(team1, team2)
             for weapon in e.weapons:
-                weapon.on_allie_die(e, team1, team2)
+                weapon.on_ally_die(e, team1, team2)
             for dragon in e.dragons:
-                dragon.on_allie_die(e, team1, team2)
-
+                dragon.on_ally_die(e, team1, team2)
+    print(f"{attacker.name} inflige {event.get_type()} à {target.name} pour un montant de {final}.")
     return final
